@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Annual Performance Evaluation - UPAK</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  :root{
+    --purple:#c62828;
+    --purple-dark:#8e0000;
+    --gray-bg:#f0ebf8;
+    --line:#e0e0e0;
+    --text:#202124;
+    --sub:#5f6368;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI', Roboto, Arial, sans-serif;
+    background:var(--gray-bg);
+    color:var(--text);
+    padding-bottom:60px;
+  }
+  .topbar{
+    height:10px;
+    background:var(--purple);
+  }
+  .container{
+    max-width:760px;
+    margin:0 auto;
+    padding:24px 16px;
+  }
+  .card{
+    background:#fff;
+    border-radius:8px;
+    box-shadow:0 1px 2px rgba(0,0,0,0.1);
+    padding:24px 28px;
+    margin-bottom:16px;
+  }
+  .header-card{
+    border-top:10px solid var(--purple);
+  }
+  h1{
+    font-size:22px;
+    margin:0 0 4px 0;
+    color:var(--text);
+  }
+  .company{
+    font-size:14px;
+    color:var(--sub);
+    margin-bottom:16px;
+  }
+  .req-note{
+    font-size:13px;
+    color:#d93025;
+    margin-top:8px;
+  }
+  .rating-def{
+    font-size:13px;
+    line-height:1.6;
+    color:var(--text);
+  }
+  .rating-def b{color:var(--purple-dark);}
+  .instructions{
+    font-size:13px;
+    color:var(--sub);
+    font-style:italic;
+    margin-top:10px;
+  }
+  label.field-label{
+    display:block;
+    font-size:15px;
+    margin-bottom:8px;
+    font-weight:500;
+  }
+  .required-star{color:#d93025;}
+  input[type=text], input[type=date], select, textarea{
+    width:100%;
+    padding:8px 4px;
+    font-size:14px;
+    border:none;
+    border-bottom:1px solid var(--line);
+    background:transparent;
+    font-family:inherit;
+    color:var(--text);
+  }
+  input[readonly]{
+    color:var(--purple-dark);
+    font-weight:600;
+    background:#faf8fd;
+    padding:8px;
+    border-radius:4px;
+    border-bottom:1px solid var(--purple);
+  }
+  input:focus, select:focus, textarea:focus{
+    outline:none;
+    border-bottom:2px solid var(--purple);
+  }
+  textarea{
+    resize:vertical;
+    min-height:50px;
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:8px;
+  }
+  .field-block{
+    margin-bottom:22px;
+  }
+  .lookup-status{
+    font-size:12.5px;
+    margin-top:6px;
+  }
+  .lookup-ok{color:#188038;}
+  .lookup-err{color:#d93025;}
+  .section-title{
+    font-size:17px;
+    font-weight:700;
+    color:var(--purple-dark);
+    margin:0 0 4px 0;
+  }
+  .q-title{
+    font-size:15px;
+    font-weight:700;
+    margin-bottom:6px;
+  }
+  .q-desc{
+    font-size:13.5px;
+    color:var(--sub);
+    line-height:1.5;
+    margin-bottom:14px;
+  }
+  .scale-row{
+    display:flex;
+    justify-content:space-between;
+    max-width:420px;
+    margin:10px 0 4px 0;
+  }
+  .scale-opt{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    font-size:13px;
+    gap:6px;
+  }
+  .scale-opt input{
+    width:20px;height:20px;accent-color:var(--purple);
+  }
+  .scale-caption{
+    display:flex;
+    justify-content:space-between;
+    max-width:420px;
+    font-size:11px;
+    color:var(--sub);
+    margin-bottom:16px;
+  }
+  .comments-label{
+    font-size:13px;
+    color:var(--sub);
+    margin-bottom:6px;
+    display:block;
+  }
+  hr.sep{
+    border:none;border-top:1px solid var(--line);margin:20px 0;
+  }
+  button{
+    font-family:inherit;
+    cursor:pointer;
+  }
+  .submit-btn{
+    background:var(--purple);
+    color:#fff;
+    border:none;
+    padding:10px 26px;
+    border-radius:4px;
+    font-size:14px;
+    font-weight:600;
+  }
+  .submit-btn:hover{background:var(--purple-dark);}
+  .clear-btn{
+    background:none;
+    border:none;
+    color:var(--purple-dark);
+    font-size:14px;
+    margin-left:12px;
+  }
+  .top-actions{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    max-width:760px;
+    margin:0 auto 8px auto;
+    padding:0 16px;
+  }
+  .link-btn{
+    background:none;
+    border:1px solid var(--purple);
+    color:var(--purple-dark);
+    padding:6px 14px;
+    border-radius:4px;
+    font-size:13px;
+  }
+  .link-btn:hover{background:var(--gray-bg);}
+  .msg-banner{
+    max-width:760px;
+    margin:12px auto;
+    padding:12px 16px;
+    border-radius:6px;
+    font-size:14px;
+    display:none;
+  }
+  .msg-ok{background:#e6f4ea;color:#188038;border:1px solid #188038;}
+  .msg-err{background:#fce8e6;color:#c5221f;border:1px solid #c5221f;}
+  table.records{
+    width:100%;
+    border-collapse:collapse;
+    font-size:12.5px;
+    margin-top:12px;
+  }
+  table.records th, table.records td{
+    border:1px solid var(--line);
+    padding:6px 8px;
+    text-align:left;
+  }
+  table.records th{background:var(--gray-bg);}
+  .small-note{font-size:12px;color:var(--sub);}
+  .modal-overlay{
+    display:none;
+    position:fixed;top:0;left:0;right:0;bottom:0;
+    background:rgba(0,0,0,0.4);
+    z-index:50;
+    align-items:flex-start;
+    justify-content:center;
+    overflow-y:auto;
+    padding:40px 12px;
+  }
+  .modal-box{
+    background:#fff;
+    border-radius:8px;
+    max-width:900px;
+    width:100%;
+    padding:20px;
+  }
+  .modal-close{
+    float:right;
+    background:none;border:none;font-size:20px;color:var(--sub);
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar"></div>
+<div class="top-actions">
+  <span class="small-note">Production · Annual Evaluation</span>
+  <button class="link-btn" id="viewRecordsBtn">View Saved Evaluations</button>
+</div>
+
+<div class="container">
+
+  <div id="msgBanner" class="msg-banner"></div>
+
+  <iframe name="hiddenSubmitFrame" style="display:none;"></iframe>
+  <form id="evalForm">
+
+    <!-- HEADER -->
+    <div class="card header-card">
+      <h1>Annual Evaluation Performance Evaluation - Production/Technical</h1>
+      <div class="company">UPAK INDUSTRIES</div>
+      <div class="rating-def">
+        <b>DEFINITION OF RATINGS</b><br>
+        <b>(5) EXCEPTIONAL:</b> Consistently exceeds all relevant performance standards.<br>
+        <b>(4) EXCEEDS EXPECTATIONS:</b> Consistently meets and often exceeds all relevant performance standards.<br>
+        <b>(3) MEETS EXPECTATIONS:</b> Meets all relevant performance standards.<br>
+        <b>(2) BELOW EXPECTATIONS:</b> Sometimes meets the performance standards.<br>
+        <b>(1) NEEDS IMPROVEMENT:</b> Consistently falls short of performance standards.
+      </div>
+      <div class="instructions">
+        Describe the employee's contributions in each of the performance categories below.
+        It is COMPULSORY that you illustrate specific, detailed examples. Ratings MUST be
+        supported and substantiated by narrative comments.
+      </div>
+    </div>
+
+    <!-- EMPLOYEE INFO -->
+    <div class="card">
+      <div class="field-block">
+        <label class="field-label">Department <span class="required-star">*</span></label>
+        <select id="deptGroup" required>
+          <option value="">-- Select department --</option>
+        </select>
+      </div>
+
+      <div class="field-block">
+        <label class="field-label">Employee Name <span class="required-star">*</span></label>
+        <select id="empCode" required disabled>
+          <option value="">-- Select department first --</option>
+        </select>
+        <div id="lookupStatus" class="lookup-status"></div>
+      </div>
+
+      <div class="field-block">
+        <label class="field-label">Employee Number</label>
+        <input type="text" id="empCodeDisplay" readonly>
+      </div>
+
+      <div class="field-block">
+        <label class="field-label">Employee Name <span class="required-star">*</span></label>
+        <input type="text" id="empName" readonly required>
+      </div>
+
+      <div class="field-block">
+        <label class="field-label">Department <span class="required-star">*</span></label>
+        <input type="text" id="empDept" readonly required>
+      </div>
+
+      <div class="field-block">
+        <label class="field-label">Section <span class="required-star">*</span></label>
+        <input type="text" id="empSection" readonly required>
+      </div>
+
+      <div class="field-block">
+        <label class="field-label">Position Title <span class="required-star">*</span></label>
+        <input type="text" id="empPosition" readonly required>
+      </div>
+
+      <div class="field-block">
+        <label class="field-label">Date of Joining <span class="required-star">*</span></label>
+        <input type="text" id="empJoinDate" readonly required>
+      </div>
+    </div>
+
+    <!-- I. TECHNICAL / WORKMANSHIP -->
+    <div class="card">
+      <div class="section-title">I. TECHNICAL / WORKMANSHIP</div>
+      <div class="small-note" style="margin-bottom:14px;">Competency</div>
+
+      <div class="q-block">
+        <div class="q-title">I.1 PRODUCTIVITY (VOLUME &amp; QUALITY OF WORK) <span class="required-star">*</span></div>
+        <div class="q-desc">
+          a.) Maintains steady, acceptable level of work output.<br>
+          b.) Quality work adheres to standards and procedures. Keeps complete and reliable records of work.<br>
+          c.) Maintains acceptable standards of workmanship.<br>
+          d.) Indicate the average productivity efficiency of the employee.
+        </div>
+        <div class="scale-row">
+          <label class="scale-opt"><input type="radio" name="q1" value="1" required>1</label>
+          <label class="scale-opt"><input type="radio" name="q1" value="2">2</label>
+          <label class="scale-opt"><input type="radio" name="q1" value="3">3</label>
+          <label class="scale-opt"><input type="radio" name="q1" value="4">4</label>
+          <label class="scale-opt"><input type="radio" name="q1" value="5">5</label>
+        </div>
+        <label class="comments-label">Comments:</label>
+        <textarea id="q1_comments" placeholder="Specific, detailed examples..."></textarea>
+      </div>
+      <hr class="sep">
+
+      <div class="q-block">
+        <div class="q-title">I.2 JOB KNOWLEDGE <span class="required-star">*</span></div>
+        <div class="q-desc">
+          a.) Understanding of job procedures, equipment and methods, responsibilities and scope of duties.<br>
+          b.) Competence in acquiring and analyzing the nature of work assignment and its corresponding action to be taken.
+        </div>
+        <div class="scale-row">
+          <label class="scale-opt"><input type="radio" name="q2" value="1" required>1</label>
+          <label class="scale-opt"><input type="radio" name="q2" value="2">2</label>
+          <label class="scale-opt"><input type="radio" name="q2" value="3">3</label>
+          <label class="scale-opt"><input type="radio" name="q2" value="4">4</label>
+          <label class="scale-opt"><input type="radio" name="q2" value="5">5</label>
+        </div>
+        <label class="comments-label">Comments:</label>
+        <textarea id="q2_comments" placeholder="Specific, detailed examples..."></textarea>
+      </div>
+      <hr class="sep">
+
+      <div class="q-block">
+        <div class="q-title">I.3 COOPERATION (Teamwork &amp; conflict resolution) <span class="required-star">*</span></div>
+        <div class="q-desc">
+          Works with others to accomplish the goals of the job and work group. Demonstrates ability
+          to get along with others, is respectful of co-workers, communicates and acts as a team player,
+          promotes teamwork, responds and acts appropriately to confrontational situations.
+        </div>
+        <div class="scale-row">
+          <label class="scale-opt"><input type="radio" name="q3" value="1" required>1</label>
+          <label class="scale-opt"><input type="radio" name="q3" value="2">2</label>
+          <label class="scale-opt"><input type="radio" name="q3" value="3">3</label>
+          <label class="scale-opt"><input type="radio" name="q3" value="4">4</label>
+          <label class="scale-opt"><input type="radio" name="q3" value="5">5</label>
+        </div>
+        <label class="comments-label">Comments:</label>
+        <textarea id="q3_comments" placeholder="Specific, detailed examples..."></textarea>
+      </div>
+    </div>
+
+    <!-- II. BEHAVIORAL ATTRIBUTES -->
+    <div class="card">
+      <div class="section-title">II. BEHAVIORAL ATTRIBUTES</div>
+      <div class="small-note" style="margin-bottom:14px;">Competency</div>
+
+      <div class="q-block">
+        <div class="q-title">II.1 WORK SAFETY AND MAINTENANCE OF RESOURCES <span class="required-star">*</span></div>
+        <div class="q-desc">
+          Organized and neat. Ensures safety of self and others through proper use and care of
+          equipment/work site. Handles and operates equipment in a careful manner; keeps tools and
+          equipment in working order and stores them properly. Keeps the work site clear of potential
+          hazards. Employee maintains a safe work environment and ensures equipment is operating properly.
+        </div>
+        <div class="scale-row">
+          <label class="scale-opt"><input type="radio" name="q4" value="1" required>1</label>
+          <label class="scale-opt"><input type="radio" name="q4" value="2">2</label>
+          <label class="scale-opt"><input type="radio" name="q4" value="3">3</label>
+          <label class="scale-opt"><input type="radio" name="q4" value="4">4</label>
+          <label class="scale-opt"><input type="radio" name="q4" value="5">5</label>
+        </div>
+        <label class="comments-label">Comments:</label>
+        <textarea id="q4_comments" placeholder="Specific, detailed examples..."></textarea>
+      </div>
+      <hr class="sep">
+
+      <div class="q-block">
+        <div class="q-title">II.2 FLEXIBILITY AND WORK UNDER PRESSURE <span class="required-star">*</span></div>
+        <div class="q-desc">
+          Demonstrates adaptability and flexibility to work on different shifts, schedules or departments.
+          Accepts changes on their daily work. Strives to learn and improve. Seeks out ways to better himself.
+          Takes on responsibilities. Does not remain idle.
+        </div>
+        <div class="scale-row">
+          <label class="scale-opt"><input type="radio" name="q5" value="1" required>1</label>
+          <label class="scale-opt"><input type="radio" name="q5" value="2">2</label>
+          <label class="scale-opt"><input type="radio" name="q5" value="3">3</label>
+          <label class="scale-opt"><input type="radio" name="q5" value="4">4</label>
+          <label class="scale-opt"><input type="radio" name="q5" value="5">5</label>
+        </div>
+        <label class="comments-label">Comments:</label>
+        <textarea id="q5_comments" placeholder="Specific, detailed examples..."></textarea>
+      </div>
+      <hr class="sep">
+
+      <div class="q-block">
+        <div class="q-title">II.3 COMMITMENT TO JOB <span class="required-star">*</span></div>
+        <div class="q-desc">
+          a.) Demonstrates a consistent, dependable work effort and positive work attitude.<br>
+          b.) Responds positively in taking new assignments and accepts challenge so that work can be
+          completed. Takes on additional responsibilities readily. Adaptable to changes in work assignments.
+        </div>
+        <div class="scale-row">
+          <label class="scale-opt"><input type="radio" name="q6" value="1" required>1</label>
+          <label class="scale-opt"><input type="radio" name="q6" value="2">2</label>
+          <label class="scale-opt"><input type="radio" name="q6" value="3">3</label>
+          <label class="scale-opt"><input type="radio" name="q6" value="4">4</label>
+          <label class="scale-opt"><input type="radio" name="q6" value="5">5</label>
+        </div>
+        <label class="comments-label">Comments:</label>
+        <textarea id="q6_comments" placeholder="Specific, detailed examples..."></textarea>
+      </div>
+    </div>
+
+    <!-- OTHER -->
+    <div class="card">
+      <div class="field-block">
+        <label class="field-label">Other comments</label>
+        <textarea id="otherComments"></textarea>
+      </div>
+      <div class="field-block">
+        <label class="field-label">Evaluated by <span class="required-star">*</span></label>
+        <input type="text" id="evaluatedBy" required>
+      </div>
+      <div class="field-block">
+        <label class="field-label">Evaluation Date <span class="required-star">*</span></label>
+        <input type="date" id="evalDate" required>
+      </div>
+    </div>
+
+    <div class="card" style="display:flex;align-items:center;">
+      <button type="submit" class="submit-btn">Submit</button>
+      <button type="reset" class="clear-btn">Clear form</button>
+    </div>
+
+  </form>
+</div>
+
+<!-- RECORDS MODAL -->
+<div class="modal-overlay" id="recordsModal">
+  <div class="modal-box">
+    <button class="modal-close" id="closeModalBtn">&times;</button>
+    <h2 style="margin-top:0;">Saved Evaluations</h2>
+    <p class="small-note">These evaluations are saved to shared storage and visible to anyone who opens this page.</p>
+    <button class="link-btn" id="exportBtn">Export All to Excel</button>
+    <div id="recordsTableWrap"><p class="small-note">Loading...</p></div>
+  </div>
+</div>
+
+<script>
+// PASTE the SAME Google Apps Script Web App URL used in the Tool Room form here,
+// so both forms feed into the same Google Sheet. Must end in /exec.
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyFHS0kqDeuXRWlvmeQkCi1a4rbYTDatMX5-K8MNDOoFyf-T4S7A09f8Qg0yPARHtN-/exec";
+
+const EMPLOYEES = {
+  "K01": {name:"Mohammed   Guesmi", dept:"Administration", section:"Administration", position:"Development Manager", joinDate:"21/02/2019"},
+  "U04": {name:"Abdu Rahiman   Thazathethil", dept:"Sales", section:"Sales", position:"Asst. Sales Manager", joinDate:"13/01/2008"},
+  "U05": {name:"Farooq   Ahmed Syed", dept:"Warehouse", section:"Warehouse", position:"Light Vehicle Driver", joinDate:"08/06/2008"},
+  "U06": {name:"Shaik   Mahamood", dept:"Warehouse", section:"Warehouse", position:"Helper", joinDate:"08/06/2008"},
+  "U08": {name:"Aliaru Kunju Nasar", dept:"Warehouse", section:"Warehouse", position:"Heavy Vehicle Driver", joinDate:"06/11/2008"},
+  "U101": {name:"Muzammil   Haque", dept:"Production", section:"Production", position:"Operator", joinDate:"01/01/2018"},
+  "U102": {name:"Sebin   Jose", dept:"Warehouse", section:"Warehouse", position:"Helper", joinDate:"20/02/2018"},
+  "U103": {name:"Maqbool   Zaman", dept:"Production", section:"Production", position:"Operator", joinDate:"03/03/2018"},
+  "U105": {name:"Ranul   Manningal", dept:"Production", section:"Production", position:"Operator", joinDate:"01/08/2018"},
+  "U106": {name:"Ratheesh Kandampully  Krishnan", dept:"Production", section:"Production", position:"Operator", joinDate:"01/08/2018"},
+  "U107": {name:"Shinu Saseendran  Kumar", dept:"Production", section:"Production", position:"Operator", joinDate:"01/08/2018"},
+  "U108": {name:"Lejla   Chochaj", dept:"Sales", section:"Sales", position:"Sales Manager", joinDate:"12/09/2018"},
+  "U109": {name:"Shehroze   Zahid", dept:"Warehouse", section:"Warehouse", position:"Helper", joinDate:"06/09/2018"},
+  "U116": {name:"Rajesh Kumar   Santhamma", dept:"Warehouse", section:"Warehouse", position:"Light Vehicle Driver", joinDate:"27/03/2019"},
+  "U118": {name:"Sadhik Mampullynhalil  Majeed", dept:"Warehouse", section:"Warehouse", position:"Helper", joinDate:"13/04/2019"},
+  "U119": {name:"Mudassar", dept:"Warehouse", section:"Warehouse", position:"Helper", joinDate:"28/04/2019"},
+  "U122": {name:"Ummar Manamkandath  Moidu", dept:"Warehouse", section:"Warehouse", position:"Light Vehicle Driver", joinDate:"11/05/2019"},
+  "U123": {name:"Moinullah   Mulla Jan", dept:"Warehouse", section:"Warehouse", position:"Light Vehicle Driver", joinDate:"14/05/2019"},
+  "U126": {name:"Arshi Abdul Rahim   Kulabkar", dept:"Warehouse", section:"Warehouse", position:"Warehouse Assistant", joinDate:"10/07/2019"},
+  "U13": {name:"Haseeb Kunnathuvalappil  Asees", dept:"Warehouse", section:"Warehouse", position:"Light Vehicle Driver", joinDate:"05/12/2010"},
+  "U130": {name:"Akeem Oladipupo  Yusuf", dept:"Warehouse", section:"Warehouse", position:"Helper", joinDate:"22/08/2019"},
+  "U136": {name:"Abid   Panichinta Vida", dept:"Sales", section:"Sales", position:"Light Vehicle Driver", joinDate:"15/10/2019"},
+  "U139": {name:"Sadique   Hossain", dept:"Warehouse", section:"Warehouse", position:"Helper", joinDate:"21/10/2019"},
+  "U142": {name:"Jithin   Paul", dept:"Production", section:"Production", position:"Helper", joinDate:"25/11/2019"},
+  "U144": {name:"Shabil Arafath  Valliyangal", dept:"Production", section:"Production", position:"Helper", joinDate:"28/11/2019"},
+  "U146": {name:"Mohamed Gafoor   Pilathottathil", dept:"Production", section:"Production", position:"Helper", joinDate:"12/12/2019"},
+  "U148": {name:"Ali   Rafiq", dept:"Sales", section:"Sales", position:"Sales Manager", joinDate:"19/01/2020"},
+  "U149": {name:"Humam   Al Attar", dept:"Sales", section:"Sales", position:"Sales Manager", joinDate:"02/02/2020"},
+  "U15": {name:"Abdul   Hannan", dept:"Production", section:"Production", position:"Operator", joinDate:"27/12/2009"},
+  "U150": {name:"Taimoor   Ali", dept:"Warehouse", section:"Warehouse", position:"Helper", joinDate:"03/02/2020"},
+  "U153": {name:"Sajid   Khan", dept:"Warehouse", section:"Warehouse", position:"Helper", joinDate:"02/03/2020"},
+  "U155": {name:"Sidheeq Ali   Varikottil", dept:"Warehouse", section:"Warehouse", position:"Helper", joinDate:"05/03/2020"},
+  "U156": {name:"Mohammad Abd Almuhdai Abdallah Al Smadi", dept:"Administration", section:"Administration", position:"Project Engineer", joinDate:"25/02/2020"},
+  "U157": {name:"Ahmed   Sibgathullah", dept:"Finance", section:"Finance", position:"Assistant Accountant", joinDate:"16/05/2020"},
+  "U16": {name:"Dhanesh Kayaramkodam  Krishnankutty", dept:"Warehouse", section:"Warehouse", position:"Light Vehicle Driver", joinDate:"14/03/2010"},
+  "U160": {name:"Prasanna Kamal   Kasturiarachchi", dept:"Finance", section:"Finance", position:"Senior Accountant", joinDate:"09/06/2020"},
+  "U161": {name:"Sahibzada   Janat Hussain", dept:"Warehouse", section:"Warehouse", position:"Light Vehicle Driver", joinDate:"11/06/2020"},
+  "U163": {name:"Saroj   Karki", dept:"Warehouse", section:"Warehouse", position:"Helper", joinDate:"15/07/2020"},
+  "U165": {name:"Salman   Afridi", dept:"Warehouse", section:"Warehouse", position:"Helper", joinDate:"08/10/2020"},
+  "U17": {name:"Sinesh   John", dept:"Production", section:"Production", position:"Supervisor", joinDate:"09/05/2007"},
+  "U171": {name:"Zar   Zada", dept:"Warehouse", section:"Warehouse", position:"Light Vehicle Driver", joinDate:"26/12/2020"},
+  "U173": {name:"Iqbaljit   Singh", dept:"Warehouse", section:"Warehouse", position:"Heavy Vehicle Driver", joinDate:"16/02/2021"},
+  "U174": {name:"Abdullah   Ashraf", dept:"Warehouse", section:"Warehouse", position:"Helper", joinDate:"16/02/2021"},
+  "U175": {name:"Mohammed   Alamgir", dept:"Production", section:"Production", position:"Helper", joinDate:"15/02/2021"},
+  "U176": {name:"Babu   Cherakutty", dept:"Warehouse", section:"Warehouse", position:"Light Vehicle Driver", joinDate:"15/03/2021"},
+  "U178": {name:"Robert   Calumpita", dept:"Administration", section:"Administration", position:"Purchase Officer", joinDate:"27/03/2021"},
+  "U179": {name:"Md   Shahid", dept:"Production", section:"Production", position:"Cleaner", joinDate:"29/03/2021"},
+  "U180": {name:"Vishnu   Babu", dept:"Warehouse", section:"Warehouse", position:"Helper", joinDate:"15/03/2021"},
+  "U181": {name:"Abhay   Shaji", dept:"Warehouse", section:"Warehouse", position:"Helper", joinDate:"31/03/2021"},
+  "U183": {name:"Abdul Gafoor   Kadavath", dept:"Warehouse", section:"Warehouse", position:"Light Vehicle Driver", joinDate:"20/04/2021"},
+  "U186": {name:"Adnan   Khan", dept:"Warehouse", section:"Warehouse", position:"Light Vehicle Driver", joinDate:"17/05/2021"},
+  "U187": {name:"Muhammad   Asif", dept:"Finance", section:"Finance", position:"Finance Manager", joinDate:"29/05/2021"},
+  "U19": {name:"Thomas Kutty   Antony", dept:"Maintenance", section:"Maintenance", position:"Maintenance Technician", joinDate:"09/05/2007"},
+  "U191": {name:"Gurtej   Singh", dept:"Production", section:"Production", position:"Operator", joinDate:"28/06/2021"},
+  "U193": {name:"Hassi   Khairajani", dept:"Administration", section:"Administration", position:"Executive Secretary", joinDate:"11/07/2021"},
+  "U194": {name:"Ahamad Sanaf Nellikunnu  Mohammed", dept:"Sales", section:"Sales", position:"Sales Representative", joinDate:"12/07/2021"},
+  "U195": {name:"Kamran   Ali", dept:"Production", section:"Production", position:"Helper", joinDate:"18/07/2021"},
+  "U198": {name:"Venu   Chinta", dept:"Production", section:"Production", position:"Operator", joinDate:"31/08/2021"},
+  "U200": {name:"Sahadev   Giri", dept:"Production", section:"Production", position:"Helper", joinDate:"04/09/2021"},
+  "U205": {name:"Bhikham   Singh", dept:"Production", section:"Production", position:"Helper", joinDate:"10/11/2021"},
+  "U206": {name:"Deepak   Sharma", dept:"Production", section:"Production", position:"Production Consultant", joinDate:"30/11/2021"},
+  "U208": {name:"Prasad   Neeraj", dept:"Production", section:"Production", position:"Operator", joinDate:"20/12/2021"},
+  "U209": {name:"Zakir   Ullah", dept:"Warehouse", section:"Warehouse", position:"Light Vehicle Driver", joinDate:"10/01/2022"},
+  "U213": {name:"Wali   Rahman", dept:"Warehouse", section:"Warehouse", position:"Helper", joinDate:"17/01/2022"},
+  "U214": {name:"Mohomed Yusuf Gammahale  Gedara Mohomed", dept:"Finance", section:"Finance", position:"Accountant", joinDate:"09/02/2022"},
+  "U215": {name:"Noman   Ahmad", dept:"Warehouse", section:"Warehouse", position:"Helper", joinDate:"14/02/2022"},
+  "U216": {name:"Imran   Khan", dept:"Warehouse", section:"Warehouse", position:"Helper", joinDate:"14/03/2022"},
+  "U217": {name:"Kashif   Ali", dept:"Warehouse", section:"Warehouse", position:"Helper", joinDate:"10/03/2022"},
+  "U218": {name:"Sandip  Dattatray   Patil", dept:"Warehouse", section:"Warehouse", position:"Helper", joinDate:"11/03/2022"},
+  "U221": {name:"Muhammad   Sajjad", dept:"Production", section:"Production", position:"Helper", joinDate:"12/03/2022"},
+  "U222": {name:"Zanna   Gurova", dept:"Purchases", section:"Purchases", position:"PROCUREMENT MANAGER.", joinDate:"01/04/2022"},
+  "U223": {name:"Mohammed   Imran", dept:"Finance", section:"Finance", position:"Accountant", joinDate:"11/04/2022"},
+  "U225": {name:"Mohammed   Abd El Ghany", dept:"Sales", section:"Sales", position:"Senior Sales Manager", joinDate:"01/04/2022"},
+  "U227": {name:"Jamal Abrahem  Abbas", dept:"Sales", section:"Sales", position:"Sales Executive", joinDate:"01/06/2022"},
+  "U23": {name:"Sylvester   Sabiniano", dept:"Production", section:"Production", position:"Operator", joinDate:"13/06/2013"},
+  "U230": {name:"Azharudheen   Akbarali", dept:"Production", section:"Production", position:"Operator", joinDate:"15/08/2022"},
+  "U231": {name:"Neethu   Purushothman Nair", dept:"Human Resources", section:"Human Resources", position:"HR Administrator", joinDate:"18/08/2022"},
+  "U232": {name:"Ashik   Antony", dept:"Production", section:"Production", position:"Machine Operator", joinDate:"27/08/2022"},
+  "U234": {name:"Muhammad   Waqar", dept:"Production", section:"Production", position:"Helper", joinDate:"20/09/2022"},
+  "U239": {name:"Masudul   Hassaion", dept:"Warehouse", section:"Warehouse", position:"Maintenance Technician", joinDate:"01/02/2023"},
+  "U240": {name:"Bradley   Rebello", dept:"Warehouse", section:"Warehouse", position:"Export Manager", joinDate:"13/02/2023"},
+  "U241": {name:"Cholo Oreo  Esponga", dept:"Production", section:"Production", position:"Assistant Production Supervisor", joinDate:"13/02/2023"},
+  "U247": {name:"Mahmoud Abdelaal   Eshra", dept:"Warehouse", section:"Warehouse", position:"Warehouse Assistant", joinDate:"06/06/2023"},
+  "U248": {name:"Sushin Cheeran  Soman", dept:"Maintenance", section:"Maintenance", position:"Maintenance Technician", joinDate:"04/08/2023"},
+  "U249": {name:"Elmi   Jebari", dept:"Warehouse", section:"Warehouse", position:"Warehouse Assistant", joinDate:"07/08/2023"},
+  "U25": {name:"Mohammed   Mofiz", dept:"Production", section:"Production", position:"Operator", joinDate:"26/04/2009"},
+  "U251": {name:"Muhammed  Famees Kallingal  Elayodath", dept:"Production", section:"Production", position:"Helper", joinDate:"01/09/2023"},
+  "U252": {name:"Jaimon Cheruvathoor  Jaison", dept:"Production", section:"Production", position:"Helper", joinDate:"01/09/2023"},
+  "U253": {name:"Mohammed  Irshad   Vengadathiyil", dept:"Production", section:"Production", position:"Helper", joinDate:"01/09/2023"},
+  "U255": {name:"Shahid   Ahmed", dept:"Production", section:"Production", position:"Helper", joinDate:"09/10/2023"},
+  "U258": {name:"Ilyas   Khan", dept:"Warehouse", section:"Warehouse", position:"Helper", joinDate:"20/10/2023"},
+  "U259": {name:"Navalu  Rahman   Kuttasseri", dept:"Warehouse", section:"Warehouse", position:"Helper", joinDate:"08/11/2023"},
+  "U26": {name:"Hamid Anwar   Noor Muhammed", dept:"Administration", section:"Administration", position:"Deputy General Manager", joinDate:"04/09/2008"},
+  "U260": {name:"Tiljo   Nellikkunnel", dept:"Production", section:"Production", position:"Helper", joinDate:"13/11/2023"},
+  "U262": {name:"Neji Mohammed Ashfaque", dept:"Finance", section:"Finance", position:"Accountant", joinDate:"18/12/2023"},
+  "U264": {name:"Muhammad   Waseem", dept:"Production", section:"Production", position:"Helper", joinDate:"02/01/2024"},
+  "U265": {name:"Sahibzada   HussainAfridi", dept:"Warehouse", section:"Warehouse", position:"Helper", joinDate:"28/12/2023"},
+  "U268": {name:"Hammad", dept:"Warehouse", section:"Warehouse", position:"Helper", joinDate:"15/02/2024"},
+  "U269": {name:"Mohamed  Medhat Mohamed  Hassan", dept:"Information Technology", section:"Information Technology", position:"IT Engineer", joinDate:"13/03/2024"},
+  "U270": {name:"Binto   Kurian", dept:"Warehouse", section:"Warehouse", position:"Helper", joinDate:"18/03/2024"},
+  "U271": {name:"Sobin   Thomas", dept:"Production", section:"Production", position:"Helper", joinDate:"18/03/2024"},
+  "U273": {name:"Mohammed  Ihsan Kallingal  Elayodath", dept:"Production", section:"Production", position:"Helper", joinDate:"01/04/2024"},
+  "U274": {name:"Rajesh Kumar   Thirunavukarashu", dept:"Production", section:"Production", position:"Machine Operator", joinDate:"04/04/2024"},
+  "U275": {name:"Albin   Albert", dept:"Production", section:"Production", position:"Helper", joinDate:"15/04/2024"},
+  "U276": {name:"Oqba   Mahmoud", dept:"Sales", section:"Sales", position:"Sales Executive", joinDate:"11/07/2024"},
+  "U277": {name:"Zainab  Nawfer   Mohamed", dept:"Administration", section:"Administration", position:"Admin Staff", joinDate:"12/08/2024"},
+  "U279": {name:"Mostafa   Kamal", dept:"Production", section:"Production", position:"Operator", joinDate:"05/09/2024"},
+  "U28": {name:"Sajan Vembinchirayil  Scaria", dept:"Sales", section:"Sales", position:"Sr. Sales Coordinator", joinDate:"09/11/2011"},
+  "U280": {name:"Chandan Kumar   Yadav", dept:"Production", section:"Production", position:"Helper", joinDate:"16/09/2024"},
+  "U281": {name:"Ernie Mamaril   Carvajal", dept:"Information Technology", section:"Information Technology", position:"IT SUPPORT", joinDate:"30/09/2024"},
+  "U282": {name:"Naveed   Ullah", dept:"Production", section:"Production", position:"Helper", joinDate:"30/09/2024"},
+  "U284": {name:"Viswanathan   Periakaruppan", dept:"Production", section:"Production", position:"Machine Operator", joinDate:"03/10/2024"},
+  "U285": {name:"Harmanjith Singh", dept:"Production", section:"Production", position:"Helper", joinDate:"01/10/2024"},
+  "U286": {name:"Mohamed  Ahmed   Mohamed  Ahmed", dept:"Warehouse", section:"Warehouse", position:"Helper", joinDate:"01/10/2024"},
+  "U287": {name:"Jashandeep   Singh", dept:"Warehouse", section:"Warehouse", position:"Helper", joinDate:"01/10/2024"},
+  "U288": {name:"Jayanth Vidya Bhavan  Rajendraprasad", dept:"Warehouse", section:"Warehouse", position:"Warehouse Assistant", joinDate:"01/10/2024"},
+  "U289": {name:"Faisal   Rafiq", dept:"Sales", section:"Sales", position:"Sales Executive", joinDate:"21/10/2024"},
+  "U291": {name:"Muhammad   Abdullah", dept:"Production", section:"Production", position:"Machine Operator", joinDate:"01/11/2024"},
+  "U292": {name:"Isaiah Momanyi  Nyamweya", dept:"Warehouse", section:"Warehouse", position:"Helper", joinDate:"01/01/2025"},
+  "U293": {name:"Tahir   Maqbul Shaik", dept:"Warehouse", section:"Warehouse", position:"Helper", joinDate:"15/01/2025"},
+  "U294": {name:"Anujith Channackal  Raveendran", dept:"Warehouse", section:"Warehouse", position:"Helper", joinDate:"15/01/2025"},
+  "U295": {name:"Stanley   John", dept:"Warehouse", section:"Warehouse", position:"Helper", joinDate:"15/01/2025"},
+  "U296": {name:"Abbas   Poozhikkunnath", dept:"Warehouse", section:"Warehouse", position:"Light Vehicle Driver", joinDate:"15/01/2025"},
+  "U297": {name:"Abdul   Goni", dept:"Production", section:"Production", position:"Helper", joinDate:"24/01/2025"},
+  "U298": {name:"Sonu   Scaria", dept:"Production", section:"Production", position:"Helper", joinDate:"30/01/2025"},
+  "U299": {name:"Muhammad Shafeekh   Chevidikunnan", dept:"Warehouse", section:"Warehouse", position:"Light Vehicle Driver", joinDate:"27/01/2025"},
+  "U35": {name:"Pradeepan   Kuttiyil", dept:"Production", section:"Production", position:"Operator", joinDate:"31/05/2009"},
+  "U36": {name:"Kurian   Thomas", dept:"Production", section:"Production", position:"Operator", joinDate:"26/05/2009"},
+  "U37": {name:"Scaria Puthenpurayil  Thomas", dept:"Production", section:"Production", position:"Operator", joinDate:"13/09/2009"},
+  "U38": {name:"Maju Mauroose  George", dept:"Production", section:"Production", position:"Operator", joinDate:"18/07/2010"},
+  "U39": {name:"Mohammed   Ismail", dept:"Production", section:"Production", position:"Operator", joinDate:"25/08/2010"},
+  "U44": {name:"Mohamed   Arshad", dept:"Warehouse", section:"Warehouse", position:"Heavy Vehicle Driver", joinDate:"20/08/2013"},
+  "U47": {name:"Muhammed Hasir   Ethikkatt", dept:"Warehouse", section:"Warehouse", position:"Light Vehicle Driver", joinDate:"22/04/2014"},
+  "U48": {name:"Selvaraj Valsalan  Pallat", dept:"Warehouse", section:"Warehouse", position:"Light Vehicle Driver", joinDate:"01/05/2014"},
+  "U49": {name:"Renjith   Raveendran Nair", dept:"Sales", section:"Sales", position:"Sales Representative", joinDate:"10/05/2014"},
+  "U50": {name:"Jinto   Jose", dept:"Warehouse", section:"Warehouse", position:"Forklift Driver", joinDate:"26/06/2014"},
+  "U56": {name:"Vinoth Kumar   Peramaiyan", dept:"Production", section:"Production", position:"Production Supervisor", joinDate:"15/07/2014"},
+  "U59": {name:"Pauline  Karen Galicia  Coronel", dept:"Sales", section:"Sales", position:"Sales Coordinator", joinDate:"01/11/2014"},
+  "U61": {name:"Sharafudheen   Soorppil", dept:"Warehouse", section:"Warehouse", position:"Heavy Vehicle Driver", joinDate:"01/11/2014"},
+  "U63": {name:"Rakesh   Kunnath", dept:"Production", section:"Production", position:"Operator", joinDate:"06/12/2014"},
+  "U66": {name:"John Rian Mercado  Olgado", dept:"Warehouse", section:"Warehouse", position:"Helper", joinDate:"14/06/2015"},
+  "U67": {name:"Rajesh   Radhakrishna Pillai", dept:"Warehouse", section:"Warehouse", position:"Helper", joinDate:"18/06/2015"},
+  "U68": {name:"Mahaboob Basha   Patan", dept:"Production", section:"Production", position:"Operator", joinDate:"27/06/2015"},
+  "U69": {name:"Mohammed Yoosaf   Moorkath", dept:"Warehouse", section:"Warehouse", position:"Light Vehicle Driver", joinDate:"01/07/2015"},
+  "U74": {name:"Jivan   Praja", dept:"Production", section:"Production", position:"Operator", joinDate:"01/03/2016"},
+  "U75": {name:"Tej   Bahadur Gurung", dept:"Production", section:"Production", position:"Operator", joinDate:"01/03/2016"},
+  "U79": {name:"Siljo Kuriakose  Pulikkottil", dept:"Production", section:"Production", position:"Operator", joinDate:"10/08/2016"},
+  "U81": {name:"Wasif   Mushtaq", dept:"Production", section:"Production", position:"Operator", joinDate:"24/08/2016"},
+  "U94": {name:"Faizal Khan   Shahul Hameed", dept:"Production", section:"Production", position:"Operator", joinDate:"24/10/2017"},
+  "U98": {name:"Shiyas   Latheefa", dept:"Warehouse", section:"Warehouse", position:"Operator", joinDate:"01/01/2018"},
+  "U99": {name:"Muhammad   Saleem", dept:"Warehouse", section:"Warehouse", position:"Operator", joinDate:"01/01/2018"},
+};
+
+// Groups the department dropdown by which excel file the employee came from.
+// Note: K1237 and Z0008 appear in both the Foam & Printing and Clear/Injection/Zeema
+// source files, so they're listed in both groups here too, matching the source data.
+const GROUPS = {
+  "Administration": ["K01","U156","U178","U193","U26","U277"],
+  "Finance": ["U157","U160","U187","U214","U223","U262"],
+  "Human Resources": ["U231"],
+  "Information Technology": ["U269","U281"],
+  "Maintenance": ["U19","U248"],
+  "Production": ["U101","U103","U105","U106","U107","U142","U144","U146","U15","U17","U175","U179","U191","U195","U198","U200","U205","U206","U208","U221","U23","U230","U232","U234","U241","U25","U251","U252","U253","U255","U260","U264","U271","U273","U274","U275","U279","U280","U282","U284","U285","U291","U297","U298","U35","U36","U37","U38","U39","U56","U63","U68","U74","U75","U79","U81","U94"],
+  "Purchases": ["U222"],
+  "Sales": ["U04","U108","U136","U148","U149","U194","U225","U227","U276","U28","U289","U49","U59"],
+  "Warehouse": ["U05","U06","U08","U102","U109","U116","U118","U119","U122","U123","U126","U13","U130","U139","U150","U153","U155","U16","U161","U163","U165","U171","U173","U174","U176","U180","U181","U183","U186","U209","U213","U215","U216","U217","U218","U239","U240","U247","U249","U258","U259","U265","U268","U270","U286","U287","U288","U292","U293","U294","U295","U296","U299","U44","U47","U48","U50","U61","U66","U67","U69","U98","U99"],
+};
+
+const deptGroupSelect = document.getElementById('deptGroup');
+const empCodeInput = document.getElementById('empCode');
+const empCodeDisplay = document.getElementById('empCodeDisplay');
+const empName = document.getElementById('empName');
+const empDept = document.getElementById('empDept');
+const empSection = document.getElementById('empSection');
+const empPosition = document.getElementById('empPosition');
+const empJoinDate = document.getElementById('empJoinDate');
+const lookupStatus = document.getElementById('lookupStatus');
+
+// Populate the department dropdown from the GROUPS keys
+for(const groupName of Object.keys(GROUPS)){
+  const opt = document.createElement('option');
+  opt.value = groupName;
+  opt.textContent = groupName;
+  deptGroupSelect.appendChild(opt);
+}
+
+deptGroupSelect.addEventListener('change', function(){
+  const group = this.value;
+  empCodeInput.innerHTML = '';
+  clearEmpFields();
+  lookupStatus.textContent = '';
+
+  if(!group){
+    empCodeInput.disabled = true;
+    const opt = document.createElement('option');
+    opt.value = '';
+    opt.textContent = '-- Select department first --';
+    empCodeInput.appendChild(opt);
+    return;
+  }
+
+  empCodeInput.disabled = false;
+  const placeholder = document.createElement('option');
+  placeholder.value = '';
+  placeholder.textContent = '-- Select employee --';
+  empCodeInput.appendChild(placeholder);
+
+  const codes = GROUPS[group].slice().sort((a,b)=> EMPLOYEES[a].name.localeCompare(EMPLOYEES[b].name));
+  for(const code of codes){
+    const opt = document.createElement('option');
+    opt.value = code;
+    opt.textContent = EMPLOYEES[code].name;
+    empCodeInput.appendChild(opt);
+  }
+});
+
+function doLookup(){
+  const raw = empCodeInput.value;
+  if(!raw){
+    clearEmpFields();
+    lookupStatus.textContent = '';
+    return;
+  }
+  const rec = EMPLOYEES[raw];
+  if(rec){
+    empCodeDisplay.value = raw;
+    empName.value = rec.name;
+    empDept.value = rec.dept;
+    empSection.value = rec.section;
+    empPosition.value = rec.position;
+    empJoinDate.value = rec.joinDate;
+    lookupStatus.textContent = '✓ Employee data loaded';
+    lookupStatus.className = 'lookup-status lookup-ok';
+  } else {
+    clearEmpFields();
+    lookupStatus.textContent = '✗ Employee not found';
+    lookupStatus.className = 'lookup-status lookup-err';
+  }
+}
+function clearEmpFields(){
+  empCodeDisplay.value = '';
+  empName.value = '';
+  empDept.value = '';
+  empSection.value = '';
+  empPosition.value = '';
+  empJoinDate.value = '';
+}
+empCodeInput.addEventListener('change', doLookup);
+
+function showMsg(text, ok){
+  const el = document.getElementById('msgBanner');
+  el.textContent = text;
+  el.className = 'msg-banner ' + (ok ? 'msg-ok' : 'msg-err');
+  el.style.display = 'block';
+  window.scrollTo({top:0, behavior:'smooth'});
+  setTimeout(()=>{ el.style.display='none'; }, 5000);
+}
+
+document.getElementById('evalForm').addEventListener('submit', function(e){
+  e.preventDefault();
+
+  const code = empCodeInput.value;
+  if(!EMPLOYEES[code]){
+    showMsg('Please select an employee before submitting.', false);
+    return;
+  }
+
+  const getVal = (name) => {
+    const el = document.querySelector(`input[name="${name}"]:checked`);
+    return el ? el.value : '';
+  };
+
+  const record = {
+    employeeCode: code,
+    employeeName: empName.value,
+    department: empDept.value,
+    section: empSection.value,
+    position: empPosition.value,
+    joinDate: empJoinDate.value,
+    q1_productivity: getVal('q1'),
+    q1_comments: document.getElementById('q1_comments').value,
+    q2_jobKnowledge: getVal('q2'),
+    q2_comments: document.getElementById('q2_comments').value,
+    q3_cooperation: getVal('q3'),
+    q3_comments: document.getElementById('q3_comments').value,
+    q4_safety: getVal('q4'),
+    q4_comments: document.getElementById('q4_comments').value,
+    q5_flexibility: getVal('q5'),
+    q5_comments: document.getElementById('q5_comments').value,
+    q6_commitment: getVal('q6'),
+    q6_comments: document.getElementById('q6_comments').value,
+    otherComments: document.getElementById('otherComments').value,
+    evaluatedBy: document.getElementById('evaluatedBy').value,
+    evalDate: document.getElementById('evalDate').value,
+    submittedAt: new Date().toISOString()
+  };
+
+  if(APPS_SCRIPT_URL.indexOf('PASTE_YOUR') === 0){
+    showMsg('This form is not connected to a Google Sheet yet. Ask the administrator to finish setup.', false);
+    return;
+  }
+
+  // Submit via a real hidden <form> POST targeting a hidden iframe.
+  // This is a plain browser form submission (not a fetch/XHR call), so it is
+  // NEVER subject to CORS or JS-level network blocking - the same mechanism
+  // any ordinary HTML <form> on the web has used for 25+ years.
+  const hiddenForm = document.createElement('form');
+  hiddenForm.method = 'POST';
+  hiddenForm.action = APPS_SCRIPT_URL;
+  hiddenForm.target = 'hiddenSubmitFrame';
+  hiddenForm.style.display = 'none';
+
+  Object.keys(record).forEach(function(key){
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = key;
+    input.value = record[key] === undefined || record[key] === null ? '' : String(record[key]);
+    hiddenForm.appendChild(input);
+  });
+
+  document.body.appendChild(hiddenForm);
+  hiddenForm.submit();
+  setTimeout(function(){ hiddenForm.remove(); }, 3000);
+
+  // We can't read the response back from a cross-site iframe target, so we
+  // optimistically confirm submission. Please verify periodically in the
+  // Google Sheet.
+  showMsg('Evaluation submitted. Please verify it appears in the Google Sheet shortly.', true);
+  document.getElementById('evalForm').reset();
+  clearEmpFields();
+  lookupStatus.textContent = '';
+});
+
+// ---- Records modal ----
+const modal = document.getElementById('recordsModal');
+document.getElementById('viewRecordsBtn').addEventListener('click', async ()=>{
+  const pw = prompt('Enter password to view saved evaluations:');
+  if(pw !== 'Kpak@123'){
+    if(pw !== null){ alert('Incorrect password.'); }
+    return;
+  }
+  modal.style.display = 'flex';
+  await loadRecords();
+});
+document.getElementById('closeModalBtn').addEventListener('click', ()=>{
+  modal.style.display = 'none';
+});
+
+let cachedRecords = [];
+
+async function loadRecords(){
+  const wrap = document.getElementById('recordsTableWrap');
+  wrap.innerHTML = '<p class="small-note">Loading...</p>';
+
+  if(APPS_SCRIPT_URL.indexOf('PASTE_YOUR') === 0){
+    wrap.innerHTML = '<p class="small-note" style="color:#c5221f;">Not connected to a Google Sheet yet.</p>';
+    cachedRecords = [];
+    return;
+  }
+
+  try{
+    const res = await fetch(APPS_SCRIPT_URL + '?data=1', { method: 'GET' });
+    const records = await res.json();
+    if(!Array.isArray(records) || records.length === 0){
+      wrap.innerHTML = '<p class="small-note">No evaluations submitted yet.</p>';
+      cachedRecords = [];
+      return;
+    }
+    records.sort((a,b)=> String(b.submittedAt||'').localeCompare(String(a.submittedAt||'')));
+    cachedRecords = records;
+
+    let html = '<table class="records"><thead><tr>' +
+      '<th>Emp #</th><th>Name</th><th>Position</th>' +
+      '<th>Prod.</th><th>Job Know.</th><th>Coop.</th><th>Safety</th><th>Flex.</th><th>Commit.</th>' +
+      '<th>Evaluated By</th><th>Date</th>' +
+      '</tr></thead><tbody>';
+    for(const r of records){
+      html += `<tr>
+        <td>${r.employeeCode||''}</td>
+        <td>${r.employeeName||''}</td>
+        <td>${r.position||''}</td>
+        <td>${r.q1_productivity||''}</td>
+        <td>${r.q2_jobKnowledge||''}</td>
+        <td>${r.q3_cooperation||''}</td>
+        <td>${r.q4_safety||''}</td>
+        <td>${r.q5_flexibility||''}</td>
+        <td>${r.q6_commitment||''}</td>
+        <td>${r.evaluatedBy||''}</td>
+        <td>${r.evalDate||''}</td>
+      </tr>`;
+    }
+    html += '</tbody></table>';
+    wrap.innerHTML = html;
+  } catch(err){
+    wrap.innerHTML = '<p class="small-note" style="color:#c5221f;">Error loading records: '+err.message+'</p>';
+  }
+}
+
+document.getElementById('exportBtn').addEventListener('click', ()=>{
+  if(!cachedRecords.length){
+    alert('No records to export yet.');
+    return;
+  }
+  const rows = cachedRecords.map(r => ({
+    'Employee Number': r.employeeCode,
+    'Employee Name': r.employeeName,
+    'Department': r.department,
+    'Section': r.section,
+    'Position Title': r.position,
+    'Date of Joining': r.joinDate,
+    'I.1 Productivity': r.q1_productivity,
+    'I.1 Comments': r.q1_comments,
+    'I.2 Job Knowledge': r.q2_jobKnowledge,
+    'I.2 Comments': r.q2_comments,
+    'I.3 Cooperation': r.q3_cooperation,
+    'I.3 Comments': r.q3_comments,
+    'II.1 Work Safety': r.q4_safety,
+    'II.1 Comments': r.q4_comments,
+    'II.2 Flexibility': r.q5_flexibility,
+    'II.2 Comments': r.q5_comments,
+    'II.3 Commitment': r.q6_commitment,
+    'II.3 Comments': r.q6_comments,
+    'Other Comments': r.otherComments,
+    'Evaluated By': r.evaluatedBy,
+    'Evaluation Date': r.evalDate,
+    'Submitted At': r.submittedAt
+  }));
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Evaluations');
+  XLSX.writeFile(wb, 'Annual_Evaluations_Export.xlsx');
+});
+</script>
+
+</body>
+</html>
